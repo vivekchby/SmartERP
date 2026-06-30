@@ -1,0 +1,41 @@
+const express = require("express");
+
+const router = express.Router();
+
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
+
+const {
+  createUser,
+  getUsers,
+  updateUser,
+  deleteUser,
+} = require("../controllers/userController");
+
+router.use(authMiddleware);
+
+router.get(
+  "/",
+  roleMiddleware("Admin"),
+  getUsers
+);
+
+router.post(
+  "/",
+  roleMiddleware("Admin"),
+  createUser
+);
+
+router.put(
+  "/:id",
+  roleMiddleware("Admin"),
+  updateUser
+);
+
+router.delete(
+  "/:id",
+  roleMiddleware("Admin"),
+  deleteUser
+);
+
+module.exports = router;
