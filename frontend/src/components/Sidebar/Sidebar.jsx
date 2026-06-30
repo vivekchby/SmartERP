@@ -26,6 +26,7 @@ import { NavLink } from "react-router-dom";
 
 
 const role = localStorage.getItem("role");
+const isAdmin = String(role || "").toLowerCase() === "admin";
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
 const mainMenus = [
@@ -34,15 +35,11 @@ const mainMenus = [
     icon: <LayoutDashboard size={20} />,
     path: "/dashboard",
   },
-  ...(role === "Admin"
-    ? [
-        {
-          name: "Company",
-          icon: <Building2 size={20} />,
-          path: "/company",
-        },
-      ]
-    : []),
+  {
+    name: "Company",
+    icon: <Building2 size={20} />,
+    path: "/company",
+  },
   {
     name: "Customers",
     icon: <Users size={20} />,
