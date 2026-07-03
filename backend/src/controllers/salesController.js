@@ -1,10 +1,12 @@
 const pool = require("../config/db");
+const { createVoucher } = require("../services/accountingService.jsx");
 
 // Create Sales Voucher
 const createSale = async (req, res) => {
+  const client = await pool.connect();
   try {
 
-    await pool.query("BEGIN");
+    await client.query("BEGIN");
     const {
       company_id,
       customer_id,
@@ -42,7 +44,7 @@ if (!items || items.length === 0) {
     message: "At least one sale item is required",
   });
 }
-const existingVoucher = await pool.query(
+const existingVoucher = await client.query(
   "SELECT id FROM sales WHERE voucher_number=$1",
   [voucher_number]
 );
@@ -52,6 +54,31 @@ if (existingVoucher.rows.length > 0) {
     success: false,
     message: "Voucher number already exists",
   });
+}
+const customerLedger = await client.query(
+  `SELECT ledger_id
+   FROM customers
+   WHERE id = $1`,
+  [customer_id]
+);
+
+if (
+  customerLedger.rows.length === 0 ||
+  !customerLedger.rows[0].ledger_id
+) {
+  throw new Error("Customer ledger not found");
+}
+
+const salesLedger = await client.query(
+  `SELECT id
+   FROM ledgers
+   WHERE company_id = $1
+   AND ledger_code = 'SALES'`,
+  [company_id]
+);
+
+if (salesLedger.rows.length === 0) {
+  throw new Error("Sales ledger not found");
 }
 
     let totalAmount = 0;
@@ -77,7 +104,7 @@ if (!item.rate || item.rate <= 0) {
     message: "Rate must be greater than zero",
   });
 }
-const stock = await pool.query(
+const stock = await client.query(
   `SELECT current_stock
    FROM stock_items
    WHERE id=$1`,
@@ -103,7 +130,7 @@ if (
       totalAmount += item.quantity * item.rate;
     }
 
-    const saleResult = await pool.query(
+    const saleResult = await client.query(
       `INSERT INTO sales
       (
         company_id,
@@ -130,7 +157,7 @@ if (
       const amount =
         item.quantity * item.rate;
 
-      await pool.query(
+      await client.query(
         `INSERT INTO sale_items
         (
           sale_id,
@@ -149,7 +176,7 @@ if (
         ]
       );
 
-      const stock = await pool.query(
+      const stock = await client.query(
   `SELECT current_stock
    FROM stock_items
    WHERE id=$1`,
@@ -164,7 +191,7 @@ if (stock.rows.length === 0) {
 }
 
 
-const customer = await pool.query(
+const customer = await client.query(
   "SELECT * FROM customers WHERE id=$1",
   [customer_id]
 );
@@ -187,7 +214,7 @@ if (
 }
 
       // Reduce Stock
-      await pool.query(
+      await client.query(
         `UPDATE stock_items
          SET current_stock =
          current_stock - $1
@@ -199,7 +226,31 @@ if (
       );
     }
 
-    await pool.query("COMMIT");
+    await createVoucher(client, {
+  company_id,
+  voucher_number,
+  voucher_type: "Sales",
+  voucher_date: sale_date,
+  narration: `Sales ${voucher_number}`,
+  created_by: req.user.id,
+
+  entries: [
+    {
+      ledger_id: customerLedger.rows[0].ledger_id,
+      debit: totalAmount,
+      credit: 0,
+    },
+    {
+      ledger_id: salesLedger.rows[0].id,
+      debit: 0,
+      credit: totalAmount,
+    },
+  ],
+});
+
+    await client.query("COMMIT");
+
+    client.release();
 
     res.status(201).json({
   success: true,

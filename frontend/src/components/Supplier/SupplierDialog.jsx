@@ -7,7 +7,7 @@ import {
   Button,
   Stack,
 } from "@mui/material";
-
+import LoadingButton from "@mui/lab/LoadingButton";
 function SupplierDialog({
   open,
   onClose,
@@ -77,17 +77,13 @@ function SupplierDialog({
           Cancel
         </Button>
 
-        <Button
+        <LoadingButton
+          loading={loading}
           variant="contained"
           onClick={onSave}
-          disabled={loading}
         >
-          {loading
-            ? "Saving..."
-            : editMode
-            ? "Update"
-            : "Save"}
-        </Button>
+          {editMode ? "Update" : "Save"}
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

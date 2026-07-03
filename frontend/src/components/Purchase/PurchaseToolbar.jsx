@@ -4,12 +4,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 
 function PurchaseToolbar({
   search,
   setSearch,
   onAdd,
+  onExport,
+  searchRef,
 }) {
   return (
     <Box
@@ -29,8 +31,8 @@ function PurchaseToolbar({
         }}
       >
         <TextField
-          size="small"
-          placeholder="Search Invoice..."
+          inputRef={searchRef}
+          label="Search Purchase"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -41,6 +43,14 @@ function PurchaseToolbar({
           onClick={onAdd}
         >
           New Purchase
+        </Button>
+
+        <Button
+          variant="outlined"
+          startIcon={<Download size={18} />}
+          onClick={onExport}
+        >
+          Export
         </Button>
       </Box>
     </Box>

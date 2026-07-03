@@ -4,12 +4,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 
 function StockToolbar({
   search,
   setSearch,
   onAdd,
+  onExport,
+  searchRef,
 }) {
   return (
     <Box
@@ -29,8 +31,8 @@ function StockToolbar({
         }}
       >
         <TextField
-          size="small"
-          placeholder="Search Item..."
+          inputRef={searchRef}
+          label="Search Item"
           value={search}
           onChange={(e) =>
             setSearch(e.target.value)
@@ -43,6 +45,14 @@ function StockToolbar({
           onClick={onAdd}
         >
           Add Item
+        </Button>
+
+        <Button
+          variant="outlined"
+          startIcon={<Download size={18} />}
+          onClick={onExport}
+        >
+          Export
         </Button>
       </Box>
     </Box>

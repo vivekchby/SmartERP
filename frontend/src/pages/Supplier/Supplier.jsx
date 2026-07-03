@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import DashboardLayout from "../../layouts/DashboardLayout";
-
+import { useRef } from "react";
+import useFormShortcuts from "../hooks/useFormShortcuts";
 import SupplierToolbar from "../../components/Supplier/SupplierToolbar";
 import SupplierTable from "../../components/Supplier/SupplierTable";
 import SupplierDialog from "../../components/Supplier/SupplierDialog";
+import ConfirmDialog from "../../components/common/CommonDialog";
+import { exportToExcel } from "../../utils/exportExcel";
 
 import {
   getSuppliers,
@@ -19,11 +22,12 @@ const initialForm = {
   phone: "",
   address: "",
 };
-
 function Supplier() {
+  const searchRef = useRef(null);
   const [suppliers, setSuppliers] = useState([]);
   const [search, setSearch] = useState("");
-
+const [confirmOpen, setConfirmOpen] = useState(false);
+const [deleteId, setDeleteId] = useState(null);
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -34,7 +38,6 @@ function Supplier() {
   useEffect(() => {
     fetchSuppliers();
   }, []);
-
   const fetchSuppliers = async () => {
     try {
       const response = await getSuppliers();
@@ -71,6 +74,7 @@ function Supplier() {
   };
 
   const handleSave = async () => {
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -102,8 +106,8 @@ function Supplier() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this supplier?")) return;
-
+setDeleteId(id);
+setConfirmOpen(true);
     try {
       await deleteSupplier(id);
 
@@ -120,6 +124,29 @@ function Supplier() {
       );
     }
   };
+  const confirmDelete = async () => {
+  try {
+    await deleteSupplier(deleteId);
+
+    toast.success("Supplier Deleted");
+
+    fetchSuppliers();
+
+  } catch (error) {
+
+    toast.error("Delete Failed");
+
+  }
+
+  setConfirmOpen(false);
+};
+
+  useFormShortcuts({
+    onSave: handleSave,
+    onNew: handleAdd,
+    onClose: () => setOpen(false),
+    searchRef,
+  });
 
   const filteredSuppliers = suppliers.filter((supplier) => {
     return (
@@ -135,12 +162,18 @@ function Supplier() {
     );
   });
 
+  const handleExport = () => {
+    exportToExcel(filteredSuppliers, "Suppliers");
+  };
+
   return (
     <DashboardLayout>
       <SupplierToolbar
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        onExport={handleExport}
+        searchRef={searchRef}
       />
 
       <SupplierTable
@@ -158,6 +191,13 @@ function Supplier() {
         editMode={editMode}
         loading={loading}
       />
+      <ConfirmDialog
+  open={confirmOpen}
+  title="Delete Supplier"
+  message="Are you sure you want to delete this supplier?"
+  onConfirm={confirmDelete}
+  onCancel={() => setConfirmOpen(false)}
+/>
     </DashboardLayout>
   );
 }

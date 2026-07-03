@@ -6,6 +6,10 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import StockToolbar from "../../components/Stock/StockToolbar";
 import StockTable from "../../components/Stock/StockTable";
 import StockDialog from "../../components/Stock/StockDialog";
+import ConfirmDialog from "../../components/common/CommonDialog";
+import { useRef } from "react";
+import useFormShortcuts from "../hooks/useFormShortcuts";
+import { exportToExcel } from "../../utils/exportExcel";
 
 import {
   getStocks,
@@ -25,9 +29,11 @@ const initialForm = {
 };
 
 function Stock() {
+  const searchRef = useRef(null);
   const [stocks, setStocks] = useState([]);
   const [search, setSearch] = useState("");
-
+const [confirmOpen, setConfirmOpen] = useState(false);
+const [deleteId, setDeleteId] = useState(null);
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -79,6 +85,7 @@ function Stock() {
   };
 
   const handleSave = async () => {
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -110,8 +117,8 @@ function Stock() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this stock item?")) return;
-
+setDeleteId(id);
+setConfirmOpen(true);
     try {
       await deleteStock(id);
 
@@ -128,6 +135,30 @@ function Stock() {
       );
     }
   };
+const confirmDelete = async () => {
+  try {
+
+    await deleteStock(deleteId);
+
+    toast.success("Stock Deleted");
+
+    fetchStock();
+
+  } catch {
+
+    toast.error("Delete Failed");
+
+  }
+
+  setConfirmOpen(false);
+};
+
+  useFormShortcuts({
+    onSave: handleSave,
+    onNew: handleAdd,
+    onClose: () => setOpen(false),
+    searchRef,
+  });
 
   const filteredStocks = stocks.filter((stock) => {
     return (
@@ -143,12 +174,18 @@ function Stock() {
     );
   });
 
+  const handleExport = () => {
+    exportToExcel(filteredStocks, "Stock");
+  };
+
   return (
     <DashboardLayout>
       <StockToolbar
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        onExport={handleExport}
+        searchRef={searchRef}
       />
 
       <StockTable
@@ -166,6 +203,13 @@ function Stock() {
         editMode={editMode}
         loading={loading}
       />
+      <ConfirmDialog
+  open={confirmOpen}
+  title="Delete Stock Item"
+  message="Are you sure you want to delete this stock item?"
+  onConfirm={confirmDelete}
+  onCancel={() => setConfirmOpen(false)}
+/>
     </DashboardLayout>
   );
 }

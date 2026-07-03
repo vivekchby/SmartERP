@@ -1,5 +1,76 @@
 const pool = require("../config/db");
 
+const trialBalance = async (req, res) => {
+  try {
+
+    const companyId = req.query.company_id;
+
+    const result = await pool.query(
+      `
+      SELECT
+
+      l.id,
+
+      l.ledger_name,
+
+      g.group_name,
+
+      COALESCE(SUM(ve.debit),0) debit,
+
+      COALESCE(SUM(ve.credit),0) credit
+
+      FROM ledgers l
+
+      LEFT JOIN groups g
+      ON l.group_id=g.id
+
+      LEFT JOIN voucher_entries ve
+      ON ve.ledger_id=l.id
+
+      LEFT JOIN vouchers v
+      ON v.id=ve.voucher_id
+      AND v.company_id=$1
+
+      WHERE l.company_id=$1
+
+      GROUP BY
+      l.id,
+      l.ledger_name,
+      g.group_name
+
+      ORDER BY
+      g.group_name,
+      l.ledger_name
+      `,
+      [companyId]
+    );
+
+    let totalDebit = 0;
+    let totalCredit = 0;
+
+    result.rows.forEach((row) => {
+      totalDebit += Number(row.debit);
+      totalCredit += Number(row.credit);
+    });
+
+    res.json({
+      success: true,
+      rows: result.rows,
+      totalDebit,
+      totalCredit,
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+
+  }
+};
 const salesReport = async (req, res) => {
   try {
     const result = await pool.query(`
@@ -70,9 +141,85 @@ const stockReport = async (req, res) => {
     });
   }
 };
+const pool = require("../config/db");
+
+const trialBalance = async (req, res) => {
+  try {
+    const { company_id } = req.query;
+
+    if (!company_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Company ID is required",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        l.id,
+        l.ledger_name,
+        g.group_name,
+
+        COALESCE(SUM(ve.debit),0) AS debit,
+        COALESCE(SUM(ve.credit),0) AS credit
+
+      FROM ledgers l
+
+      JOIN groups g
+      ON l.group_id = g.id
+
+      LEFT JOIN voucher_entries ve
+      ON l.id = ve.ledger_id
+
+      LEFT JOIN vouchers v
+      ON v.id = ve.voucher_id
+      AND v.company_id = $1
+
+      WHERE l.company_id = $1
+
+      GROUP BY
+      l.id,
+      l.ledger_name,
+      g.group_name
+
+      ORDER BY
+      g.group_name,
+      l.ledger_name
+      `,
+      [company_id]
+    );
+
+    let totalDebit = 0;
+    let totalCredit = 0;
+
+    result.rows.forEach((row) => {
+      totalDebit += Number(row.debit);
+      totalCredit += Number(row.credit);
+    });
+
+    res.json({
+      success: true,
+      rows: result.rows,
+      totalDebit,
+      totalCredit,
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
 
 module.exports = {
   salesReport,
   purchaseReport,
   stockReport,
+  trialBalance
 };

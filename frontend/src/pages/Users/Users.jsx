@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useRef } from "react";
 
 import DashboardLayout from "../../layouts/DashboardLayout";
 import UserToolbar from "../../components/Users/UserToolbar";
@@ -12,6 +13,9 @@ import {
   updateUser,
   deleteUser,
 } from "../../services/userApi";
+import ConfirmDialog from "../../components/common/CommonDialog";
+import useFormShortcuts from "../hooks/useFormShortcuts";
+import { exportToExcel } from "../../utils/exportExcel";
 
 const initialForm = {
   name: "",
@@ -21,6 +25,7 @@ const initialForm = {
 };
 
 function Users() {
+  const searchRef = useRef(null);
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -28,7 +33,8 @@ function Users() {
   const [selectedId, setSelectedId] = useState(null);
   const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-
+const [confirmOpen,setConfirmOpen]=useState(false);
+const [deleteId,setDeleteId]=useState(null);
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -63,6 +69,7 @@ function Users() {
   };
 
   const handleSave = async () => {
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -101,8 +108,8 @@ function Users() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this user?")) return;
-
+    setDeleteId(id);
+setConfirmOpen(true);
     try {
       await deleteUser(id);
       toast.success("User deleted successfully");
@@ -116,6 +123,33 @@ function Users() {
     }
   };
 
+  const confirmDelete=async()=>{
+
+try{
+
+await deleteUser(deleteId);
+
+toast.success("User Deleted");
+
+fetchUsers();
+
+}catch{
+
+toast.error("Delete Failed");
+
+}
+
+setConfirmOpen(false);
+
+}
+
+  useFormShortcuts({
+    onSave: handleSave,
+    onNew: handleAdd,
+    onClose: () => setOpen(false),
+    searchRef,
+  });
+
   const filteredUsers = users.filter((user) => {
     return (
       user.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -124,12 +158,18 @@ function Users() {
     );
   });
 
+  const handleExport = () => {
+    exportToExcel(filteredUsers, "Users");
+  };
+
   return (
     <DashboardLayout>
       <UserToolbar
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        onExport={handleExport}
+        searchRef={searchRef}
       />
 
       <UserTable
@@ -147,6 +187,13 @@ function Users() {
         editMode={editMode}
         loading={loading}
       />
+      <ConfirmDialog
+open={confirmOpen}
+title="Delete User"
+message="Delete this user?"
+onConfirm={confirmDelete}
+onCancel={()=>setConfirmOpen(false)}
+/>
     </DashboardLayout>
   );
 }

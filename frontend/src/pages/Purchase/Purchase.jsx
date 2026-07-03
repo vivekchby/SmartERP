@@ -6,6 +6,7 @@ import DashboardLayout from "../../layouts/DashboardLayout";
 import PurchaseToolbar from "../../components/Purchase/PurchaseToolbar";
 import PurchaseTable from "../../components/Purchase/PurchaseTable";
 import PurchaseDialog from "../../components/Purchase/PurchaseDialog";
+import ConfirmDialog from "../../components/common/CommonDialog";
 
 import {
   getPurchases,
@@ -15,6 +16,9 @@ import {
 } from "../../services/purchaseApi";
 import { getSuppliers } from "../../services/supplierApi";
 import { getStocks } from "../../services/stockApi";
+import { useRef } from "react";
+import useFormShortcuts from "../hooks/useFormShortcuts";
+import { exportToExcel } from "../../utils/exportExcel";
 
 const initialForm = {
   supplier_id: "",
@@ -32,12 +36,14 @@ const initialForm = {
 };
 
 function Purchase() {
+  const searchRef = useRef(null);
   const [purchases, setPurchases] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [stocks, setStocks] = useState([]);
 
   const [search, setSearch] = useState("");
-
+const [confirmOpen,setConfirmOpen]=useState(false);
+const [deleteId,setDeleteId]=useState(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -102,6 +108,7 @@ function Purchase() {
   };
 
   const handleSave = async () => {
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -150,8 +157,8 @@ function Purchase() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this purchase?")) return;
-
+    setDeleteId(id);
+setConfirmOpen(true);
     try {
       await deletePurchase(id);
 
@@ -165,6 +172,31 @@ function Purchase() {
       );
     }
   };
+const confirmDelete=async()=>{
+
+try{
+
+await deletePurchase(deleteId);
+
+toast.success("Purchase Deleted");
+
+fetchPurchases();
+
+}catch{
+
+toast.error("Delete Failed");
+
+}
+
+setConfirmOpen(false);
+
+}
+  useFormShortcuts({
+    onSave: handleSave,
+    onNew: handleAdd,
+    onClose: () => setOpen(false),
+    searchRef,
+  });
 
   const filteredPurchases = purchases.filter((purchase) => {
     return (
@@ -177,6 +209,10 @@ function Purchase() {
     );
   });
 
+  const handleExport = () => {
+    exportToExcel(filteredPurchases, "Purchases");
+  };
+
   return (
     <DashboardLayout>
 
@@ -184,6 +220,8 @@ function Purchase() {
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        onExport={handleExport}
+        searchRef={searchRef}
       />
 
       <PurchaseTable
@@ -201,8 +239,15 @@ function Purchase() {
         stocks={stocks}
         loading={loading}
         onSave={handleSave}
+        editMode={Boolean(formData?.id)}
       />
-
+<ConfirmDialog
+open={confirmOpen}
+title="Delete Purchase"
+message="Delete this purchase?"
+onConfirm={confirmDelete}
+onCancel={()=>setConfirmOpen(false)}
+/>
     </DashboardLayout>
   );
 }

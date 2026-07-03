@@ -5,12 +5,14 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 
 function CustomerToolbar({
   search,
   setSearch,
   onAdd,
+  onExport,
+  searchRef,
 }) {
   return (
     <Box
@@ -30,13 +32,13 @@ function CustomerToolbar({
         }}
       >
         <TextField
-          size="small"
-          placeholder="Search Customer..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-        />
+inputRef={searchRef}
+label="Search Customer"
+value={search}
+onChange={(e)=>
+setSearch(e.target.value)
+}
+/>
 
         <Button
           variant="contained"
@@ -44,6 +46,14 @@ function CustomerToolbar({
           onClick={onAdd}
         >
           Add Customer
+        </Button>
+
+        <Button
+          variant="outlined"
+          startIcon={<Download size={18} />}
+          onClick={onExport}
+        >
+          Export
         </Button>
       </Box>
     </Box>

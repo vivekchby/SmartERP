@@ -17,6 +17,8 @@ require("./src/routes/supplierRoutes");
 const stockRoutes =
 require("./src/routes/stockRoutes");
 
+const ledgerRoutes = require("./src/routes/ledgerRoutes");
+
 const purchaseRoutes =
 require("./src/routes/purchaseRoutes");
 
@@ -32,10 +34,15 @@ require("./src/routes/dashboardRoutes");
 const reportRoutes =
 require("./src/routes/reportRoutes");
 
+const groupRoutes = require("./src/routes/groupRoutes");
+
 const dashboardAnalyticsRoutes = require("./src/routes/dashboardAnalyticsRoutes");
 
 const profileRoutes =
 require("./src/routes/profileRoutes");
+
+const voucherRoutes =
+require("./src/routes/voucherRoutes");
 
 const app = express();
 app.use(cors());
@@ -47,14 +54,25 @@ app.use(
 );
 
 app.use(express.json());
-
+app.get("/api/test", (req, res) => {
+  res.json({ message: "API Working" });
+});
 app.use("/api/auth", authRoutes);
 
 app.use("/api/company", companyRoutes);
   
 app.use("/api/stock", stockRoutes);
 
+app.use(["/api/group", "/api/groups"], groupRoutes);
+
+app.use(
+  "/api/voucher",
+  voucherRoutes
+);
+
 app.use("/api/customer", customerRoutes);
+
+app.use("/api/ledger", ledgerRoutes);
 
 app.use("/api/supplier", supplierRoutes);
 
@@ -66,7 +84,9 @@ app.use("/api/invoice", invoiceRoutes);
 
 app.use("/api/dashboard", dashboardRoutes);
 
-app.use("/api/reports", reportRoutes);
+app.use(["/api/group", "/api/groups"], groupRoutes);
+
+app.use(["/api/report", "/api/reports"], reportRoutes);
 
 app.use(
   "/api/dashboard-analytics",

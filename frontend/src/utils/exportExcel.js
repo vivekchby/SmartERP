@@ -5,31 +5,36 @@ export const exportToExcel = (
   data,
   fileName
 ) => {
+
   const worksheet =
-    XLSX.utils.json_to_sheet(data);
+  XLSX.utils.json_to_sheet(data);
 
   const workbook =
-    XLSX.utils.book_new();
+  XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(
-    workbook,
-    worksheet,
-    "Report"
+      workbook,
+      worksheet,
+      "Sheet1"
   );
 
   const excelBuffer =
-    XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
+  XLSX.write(workbook,{
+      bookType:"xlsx",
+      type:"array"
+  });
 
-  const fileData = new Blob(
-    [excelBuffer],
-    {
-      type:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    }
+  const blob = new Blob(
+      [excelBuffer],
+      {
+        type:
+"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      }
   );
 
-  saveAs(fileData, `${fileName}.xlsx`);
+  saveAs(
+      blob,
+      `${fileName}.xlsx`
+  );
+
 };

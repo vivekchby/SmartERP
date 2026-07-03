@@ -1,8 +1,10 @@
 import { Box } from "@mui/material";
 import Sidebar from "../components/Sidebar/Sidebar";
 import Navbar from "../components/Navbar/Navbar";
-
+import useGlobalShortcuts from "../pages/hooks/useGlobalShortcuts";
 function DashboardLayout({ children }) {
+  useGlobalShortcuts();
+
   return (
     <Box
       sx={{

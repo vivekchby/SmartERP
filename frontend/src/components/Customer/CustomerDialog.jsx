@@ -7,7 +7,7 @@ import {
   Button,
   Grid,
 } from "@mui/material";
-
+import LoadingButton from "@mui/lab/LoadingButton";
 function CustomerDialog({
   open,
   onClose,
@@ -81,17 +81,13 @@ function CustomerDialog({
           Cancel
         </Button>
 
-        <Button
+        <LoadingButton
+          loading={loading}
           variant="contained"
           onClick={onSave}
-          disabled={loading}
         >
-          {loading
-            ? "Saving..."
-            : editMode
-            ? "Update"
-            : "Save"}
-        </Button>
+          {editMode ? "Update" : "Save"}
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

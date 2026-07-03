@@ -10,6 +10,9 @@ const {
   getUsers,
   updateUser,
   deleteUser,
+  getProfile,
+  updateProfile,
+  changePassword,
 } = require("../controllers/userController");
 
 router.use(authMiddleware);
@@ -36,6 +39,23 @@ router.delete(
   "/:id",
   roleMiddleware("Admin"),
   deleteUser
+);
+router.get(
+"/profile",
+authMiddleware,
+getProfile
+);
+
+router.put(
+"/profile",
+authMiddleware,
+updateProfile
+);
+
+router.put(
+"/change-password",
+authMiddleware,
+changePassword
 );
 
 module.exports = router;

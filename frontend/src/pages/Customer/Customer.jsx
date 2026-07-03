@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import DashboardLayout from "../../layouts/DashboardLayout";
-
+import useFormShortcuts from "../hooks/useFormShortcuts";
+import { useRef } from "react";
 import CustomerToolbar from "../../components/Customer/CustomerToolbar";
 import CustomerTable from "../../components/Customer/CustomerTable";
 import CustomerDialog from "../../components/Customer/CustomerDialog";
+import ConfirmDialog from "../../components/common/CommonDialog";
 
 import {
   getCustomers,
@@ -13,7 +15,7 @@ import {
   updateCustomer,
   deleteCustomer,
 } from "../../services/customerApi";
-
+import { exportToExcel } from "../../utils/exportExcel";
 const initialForm = {
   name: "",
   phone: "",
@@ -21,16 +23,20 @@ const initialForm = {
 };
 
 function Customer() {
+  const searchRef = useRef(null);
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState("");
+const [confirmOpen, setConfirmOpen] =
+useState(false);
 
+const [deleteId, setDeleteId] =
+useState(null);
   const [open, setOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
   const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     fetchCustomers();
   }, []);
@@ -64,6 +70,7 @@ function Customer() {
   };
 
   const handleSave = async () => {
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -93,7 +100,9 @@ function Customer() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this customer?")) return;
+    setDeleteId(id);
+
+setConfirmOpen(true);
 
     try {
       await deleteCustomer(id);
@@ -109,6 +118,35 @@ function Customer() {
       );
     }
   };
+const confirmDelete = async () => {
+
+    try{
+
+        await deleteCustomer(deleteId);
+
+        toast.success(
+        "Customer Deleted"
+        );
+
+        fetchCustomers();
+
+    }catch(error){
+
+        toast.error(
+        "Delete Failed"
+        );
+
+    }
+
+    setConfirmOpen(false);
+
+};
+  useFormShortcuts({
+    onSave: handleSave,
+    onNew: handleAdd,
+    onClose: () => setOpen(false),
+    searchRef,
+  });
 
   const filteredCustomers = customers.filter(
     (customer) =>
@@ -123,6 +161,10 @@ function Customer() {
         .includes(search.toLowerCase())
   );
 
+  const handleExport = () => {
+    exportToExcel(filteredCustomers, "Customers");
+  };
+
   return (
     <DashboardLayout>
 
@@ -130,6 +172,8 @@ function Customer() {
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        onExport={handleExport}
+        searchRef={searchRef}
       />
 
       <CustomerTable
@@ -147,6 +191,21 @@ function Customer() {
         editMode={editMode}
         loading={loading}
       />
+      <ConfirmDialog
+
+open={confirmOpen}
+
+title="Delete Customer"
+
+message="Are you sure you want to delete this customer?"
+
+onConfirm={confirmDelete}
+
+onCancel={()=>
+setConfirmOpen(false)
+}
+
+/>
 
     </DashboardLayout>
   );

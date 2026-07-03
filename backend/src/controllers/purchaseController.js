@@ -1,9 +1,13 @@
 const pool = require("../config/db");
+const { createVoucher } = require("../services/accountingService.jsx");
 
 // Create Purchase Voucher
 const createPurchase = async (req, res) => {
-  try {
-    await pool.query("BEGIN");
+  const client = await pool.connect();
+
+try {
+
+    await client.query("BEGIN");
     const {
       company_id,
       supplier_id,
@@ -42,7 +46,7 @@ if (!items || items.length === 0) {
   });
 }
 // Check Duplicate Voucher Number
-const existingVoucher = await pool.query(
+const existingVoucher = await client.query(
   "SELECT id FROM purchases WHERE voucher_number = $1",
   [voucher_number]
 );
@@ -54,7 +58,7 @@ if (existingVoucher.rows.length > 0) {
   });
 }
 
-    const supplier = await pool.query(
+    const supplier = await client.query(
   "SELECT * FROM suppliers WHERE id=$1",
   [supplier_id]
 );
@@ -90,7 +94,7 @@ if (!item.rate || item.rate <= 0) {
   });
 }
 
-      const stock = await pool.query(
+      const stock = await client.query(
   "SELECT * FROM stock_items WHERE id=$1",
   [item.stock_item_id]
 );
@@ -105,7 +109,7 @@ if (stock.rows.length === 0) {
       totalAmount += item.quantity * item.rate;
     }
 
-    const purchaseResult = await pool.query(
+    const purchaseResult = await client.query(
       `INSERT INTO purchases
       (
         company_id,
@@ -131,7 +135,7 @@ if (stock.rows.length === 0) {
       const amount =
         item.quantity * item.rate;
 
-      await pool.query(
+      await client.query(
         `INSERT INTO purchase_items
         (
           purchase_id,
@@ -150,7 +154,7 @@ if (stock.rows.length === 0) {
         ]
       );
 
-      await pool.query(
+      await client.query(
         `UPDATE stock_items
          SET current_stock =
          current_stock + $1
@@ -162,7 +166,42 @@ if (stock.rows.length === 0) {
       );
     }
 
-    await pool.query("COMMIT");
+    await createVoucher(
+    client,
+    {
+        company_id,
+        voucher_number,
+        voucher_type: "Purchase",
+        voucher_date: purchase_date,
+        narration:
+        `Purchase ${voucher_number}`,
+        created_by: req.user.id,
+
+        entries: [
+            {
+                ledger_id:
+                purchaseLedger.rows[0].id,
+
+                debit: totalAmount,
+
+                credit: 0,
+            },
+
+            {
+                ledger_id:
+                supplierLedger.rows[0].ledger_id,
+
+                debit: 0,
+
+                credit: totalAmount,
+            },
+        ],
+    }
+);
+
+    await client.query("COMMIT");
+
+    client.release();
 
    res.status(201).json({
   success: true,
@@ -174,10 +213,13 @@ if (stock.rows.length === 0) {
     await pool.query("ROLLBACK");
     console.error(error);
 
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    if (client) {
+
+    await client.query("ROLLBACK");
+
+    client.release();
+
+}
   }
 };
 

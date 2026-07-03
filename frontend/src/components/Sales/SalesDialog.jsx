@@ -9,7 +9,7 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-
+import LoadingButton from "@mui/lab/LoadingButton";
 import SalesItemsTable from "./SalesItemsTable";
 
 function SalesDialog({
@@ -21,6 +21,7 @@ function SalesDialog({
   stocks,
   loading,
   onSave,
+  editMode = false,
 }) {
   const handleChange = (e) => {
     setFormData({
@@ -133,15 +134,13 @@ function SalesDialog({
           Cancel
         </Button>
 
-        <Button
+        <LoadingButton
+          loading={loading}
           variant="contained"
-          disabled={loading}
           onClick={onSave}
         >
-          {loading
-            ? "Saving..."
-            : "Save Sale"}
-        </Button>
+          {editMode ? "Update" : "Save"}
+        </LoadingButton>
 
       </DialogActions>
 

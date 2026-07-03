@@ -39,6 +39,22 @@ if (!address) {
     });
 }
 
+// Get Sundry Debtors Group
+const debtorGroup = await pool.query(
+  `SELECT id
+   FROM groups
+   WHERE company_id=$1
+   AND group_name='Sundry Debtors'`,
+  [company_id]
+);
+
+if (debtorGroup.rows.length === 0) {
+  return res.status(400).json({
+    success: false,
+    message: "Sundry Debtors group not found",
+  });
+}
+
  const existingCustomer = await pool.query(
     `SELECT id
      FROM customers
@@ -53,17 +69,49 @@ if (existingCustomer.rows.length > 0) {
         message: "Customer with this phone number already exists"
     });
 }
+const ledgerResult = await pool.query(
+  `INSERT INTO ledgers
+  (
+    company_id,
+    group_id,
+    ledger_name,
+    opening_balance,
+    balance_type
+  )
+  VALUES($1,$2,$3,$4,$5)
+  RETURNING id`,
+  [
+    company_id,
+    debtorGroup.rows[0].id,
+    customer_name,
+    0,
+    "Dr",
+  ]
+);
+
+const ledgerId = ledgerResult.rows[0].id;
 
     const result = await pool.query(
       `INSERT INTO customers
-      (company_id,name,phone,address)
-      VALUES($1,$2,$3,$4)
+(
+ company_id,
+ ledger_id,
+ customer_name,
+ phone,
+ email,
+ address,
+ gst_number
+)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
       RETURNING *`,
       [
         company_id,
+        ledgerId,
         name,
         phone,
-        address
+        email,
+        address,
+        gst_number
       ]
     );
    

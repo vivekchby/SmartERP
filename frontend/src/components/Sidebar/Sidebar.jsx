@@ -6,9 +6,11 @@ import {
   Boxes,
   ShoppingCart,
   Receipt,
+  FolderTree,
   BarChart3,
   User,
   UserCog,
+  Scale,
   LogOut,
 } from "lucide-react";
 import {
@@ -26,7 +28,6 @@ import { NavLink } from "react-router-dom";
 
 
 const role = localStorage.getItem("role");
-const isAdmin = String(role || "").toLowerCase() === "admin";
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
 const mainMenus = [
@@ -40,6 +41,21 @@ const mainMenus = [
     icon: <Building2 size={20} />,
     path: "/company",
   },
+  {
+  name: "Vouchers",
+  icon: <Receipt size={20} />,
+  path: "/vouchers",
+},
+{
+name:"Trial Balance",
+icon:<Scale size={20}/>,
+path:"/trial-balance"
+},
+  {
+  name: "Groups",
+  icon: <FolderTree size={20} />,
+  path: "/groups",
+},
   {
     name: "Customers",
     icon: <Users size={20} />,
@@ -76,9 +92,9 @@ const adminMenus =
   role === "Admin"
     ? [
         {
-          name: "Users",
+          name: "Profile",
           icon: <UserCog size={20} />,
-          path: "/users",
+          path: "/profile",
         },
       ]
     : [];

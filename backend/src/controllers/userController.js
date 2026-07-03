@@ -89,7 +89,41 @@ const createUser = async (req, res) => {
     });
   }
 };
+const updateProfile=async(req,res)=>{
 
+const {name,email}=req.body;
+
+const result=await pool.query(
+
+`UPDATE users
+
+SET
+
+name=$1,
+
+email=$2
+
+WHERE id=$3
+
+RETURNING id,name,email`,
+
+[
+name,
+email,
+req.user.id
+]
+
+);
+
+res.json({
+
+success:true,
+
+user:result.rows[0]
+
+});
+
+}
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -165,7 +199,112 @@ const updateUser = async (req, res) => {
     });
   }
 };
+// GET Profile
+const getProfile = async (req, res) => {
 
+    try{
+
+        const result =
+        await pool.query(
+
+        `SELECT
+            id,
+            name,
+            email,
+            role,
+            company_id
+         FROM users
+         WHERE id=$1`,
+
+        [req.user.id]
+
+        );
+
+        res.json({
+            success:true,
+            user:result.rows[0]
+        });
+
+    }catch(error){
+
+        res.status(500).json({
+            success:false,
+            message:error.message
+        });
+
+    }
+
+}
+const changePassword=async(req,res)=>{
+
+const{
+
+oldPassword,
+
+newPassword
+
+}=req.body;
+
+const user=await pool.query(
+
+"SELECT * FROM users WHERE id=$1",
+
+[
+req.user.id
+]
+
+);
+
+const isMatch=
+
+await bcrypt.compare(
+
+oldPassword,
+
+user.rows[0].password
+
+);
+
+if(!isMatch){
+
+return res.status(400).json({
+
+message:"Old Password Incorrect"
+
+});
+
+}
+
+const hash=
+
+await bcrypt.hash(
+
+newPassword,
+
+10
+
+);
+
+await pool.query(
+
+"UPDATE users SET password=$1 WHERE id=$2",
+
+[
+hash,
+req.user.id
+]
+
+);
+
+res.json({
+
+success:true,
+
+message:"Password Updated"
+
+});
+
+}
 const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -216,4 +355,7 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  getProfile,
+  updateProfile,
+  changePassword,
 };

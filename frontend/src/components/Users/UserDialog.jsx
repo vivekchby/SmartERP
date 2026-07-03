@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Grid } from "@mui/material";
-
+import LoadingButton from "@mui/lab/LoadingButton";
 function UserDialog({ open, onClose, formData, setFormData, onSave, editMode, loading }) {
   const handleChange = (e) => {
     setFormData({
@@ -63,9 +63,9 @@ function UserDialog({ open, onClose, formData, setFormData, onSave, editMode, lo
 
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={onSave} disabled={loading}>
-          {loading ? "Saving..." : editMode ? "Update" : "Save"}
-        </Button>
+        <LoadingButton loading={loading} variant="contained" onClick={onSave}>
+          {editMode ? "Update" : "Save"}
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

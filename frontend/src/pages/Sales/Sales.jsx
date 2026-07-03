@@ -9,6 +9,9 @@ import SalesDialog from "../../components/Sales/SalesDialog";
 import { getSales, createSale, deleteSale } from "../../services/salesApi";
 import { getCustomers } from "../../services/customerApi";
 import { getStocks } from "../../services/stockApi";
+import { useRef } from "react";
+import useFormShortcuts from "../hooks/useFormShortcuts";
+import { exportToExcel } from "../../utils/exportExcel";
 
 const initialForm = {
   customer_id: "",
@@ -26,12 +29,14 @@ const initialForm = {
 };
 
 function Sales() {
+  const searchRef = useRef(null);
   const [sales, setSales] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [stocks, setStocks] = useState([]);
 
   const [search, setSearch] = useState("");
-
+const [confirmOpen,setConfirmOpen]=useState(false);
+const [deleteId,setDeleteId]=useState(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -116,6 +121,7 @@ function Sales() {
   };
 
   const handleSave = async () => {
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -159,6 +165,13 @@ function Sales() {
     }
   };
 
+  useFormShortcuts({
+    onSave: handleSave,
+    onNew: handleAdd,
+    onClose: () => setOpen(false),
+    searchRef,
+  });
+
   const filteredSales = sales.filter((sale) => {
     return (
       sale.voucher_number
@@ -171,6 +184,10 @@ function Sales() {
     );
   });
 
+  const handleExport = () => {
+    exportToExcel(filteredSales, "Sales");
+  };
+
   return (
     <DashboardLayout>
 
@@ -178,6 +195,8 @@ function Sales() {
         search={search}
         setSearch={setSearch}
         onAdd={handleAdd}
+        onExport={handleExport}
+        searchRef={searchRef}
       />
 
       <SalesTable
@@ -193,6 +212,7 @@ function Sales() {
         stocks={stocks}
         loading={loading}
         onSave={handleSave}
+        editMode={Boolean(formData?.id)}
       />
 
     </DashboardLayout>

@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import Vouchers from "./pages/Vouchers/Vouchers";
 import Login from "./pages/Login/Login";
 import Users from "./pages/Users/Users";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -14,6 +14,8 @@ import Register from "./pages/Register/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./pages/Profile/Profile";
 import ChangePassword from "./pages/ChangePassword/ChangePassword";
+import Groups from "./pages/Groups/Groups";
+import TrialBalance from "./pages/Reports/TrialBalance";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -45,6 +47,15 @@ function App() {
         }
       />
 
+      <Route
+  path="/groups"
+  element={
+    <ProtectedRoute>
+      <Groups />
+    </ProtectedRoute>
+  }
+/>
+
       {/* Company */}
 
       <Route
@@ -55,6 +66,24 @@ function App() {
           </ProtectedRoute>
         }
       />
+
+      <Route
+  path="/vouchers"
+  element={
+    <ProtectedRoute>
+      <Vouchers />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+path="/trial-balance"
+element={
+<ProtectedRoute>
+<TrialBalance/>
+</ProtectedRoute>
+}
+/>
 
       {/* Customer */}
 

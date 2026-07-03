@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 
-function UserToolbar({ search, setSearch, onAdd }) {
+function UserToolbar({ search, setSearch, onAdd, onExport, searchRef }) {
   return (
     <Box
       sx={{
@@ -15,11 +15,11 @@ function UserToolbar({ search, setSearch, onAdd }) {
     >
       <Box sx={{ display: "flex", gap: 2 }}>
         <TextField
-          size="small"
-          placeholder="Search Users..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+inputRef={searchRef}
+label="Search Users"
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+/>
 
         <Button
           variant="contained"
@@ -27,6 +27,14 @@ function UserToolbar({ search, setSearch, onAdd }) {
           onClick={onAdd}
         >
           Add User
+        </Button>
+
+        <Button
+          variant="outlined"
+          startIcon={<Download size={18} />}
+          onClick={onExport}
+        >
+          Export
         </Button>
       </Box>
     </Box>
