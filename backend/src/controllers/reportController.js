@@ -71,7 +71,6 @@ const stockReport = async (req, res) => {
     });
   }
 };
-const pool = require("../config/db");
 
 const trialBalance = async (req, res) => {
   try {

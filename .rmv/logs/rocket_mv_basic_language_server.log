@@ -2320,3 +2320,5 @@ Account{name=..., path=..., type=PREDICT}
 2026-07-03 20:11:33.352 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
 2026-07-03 20:13:54.397 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src)
 2026-07-03 20:13:57.027 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend)
+2026-07-03 20:24:27.044 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/routes)
+2026-07-03 20:24:41.493 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
