@@ -252,7 +252,8 @@ const deleteCompany = async (req, res) => {
 "SELECT * FROM companies WHERE id=$1",
 [req.params.id]
 );
-
+console.log("Company ID:", req.params.id);
+console.log("Logged in User:", req.user);
 if(company.rows.length===0){
 
 return res.status(404).json({
@@ -294,15 +295,23 @@ message:"Cannot delete company because related records exist"
 });
 
 }
-    await pool.query(
-      "DELETE FROM companies WHERE id=$1 AND user_id=$2",
-      [req.params.id, req.user.id]
-    );
+    const result = await pool.query(
+  "DELETE FROM companies WHERE id=$1 AND user_id=$2 RETURNING id",
+  [req.params.id, req.user.id]
+);
 
-    res.json({
-      success: true,
-      message: "Company deleted successfully"
-    });
+if (result.rows.length === 0) {
+  return res.status(403).json({
+    success: false,
+    message: "You are not authorized to delete this company."
+  });
+}
+
+res.json({
+  success: true,
+  message: "Company deleted successfully"
+});
+
 
   } catch (error) {
     res.status(500).json({

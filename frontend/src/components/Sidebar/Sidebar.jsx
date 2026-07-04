@@ -6,11 +6,14 @@ import {
   Boxes,
   ShoppingCart,
   Receipt,
+  FileText,
+  Scale,
   FolderTree,
+  BookOpen,
   BarChart3,
   User,
   UserCog,
-  Scale,
+  KeyRound,
   LogOut,
 } from "lucide-react";
 import {
@@ -30,7 +33,11 @@ import { NavLink } from "react-router-dom";
 const role = localStorage.getItem("role");
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-const mainMenus = [
+const menus = [
+  // MAIN
+  {
+    section: "MAIN",
+  },
   {
     name: "Dashboard",
     icon: <LayoutDashboard size={20} />,
@@ -41,21 +48,11 @@ const mainMenus = [
     icon: <Building2 size={20} />,
     path: "/company",
   },
+
+  // OPERATIONS
   {
-  name: "Vouchers",
-  icon: <Receipt size={20} />,
-  path: "/vouchers",
-},
-{
-name:"Trial Balance",
-icon:<Scale size={20}/>,
-path:"/trial-balance"
-},
-  {
-  name: "Groups",
-  icon: <FolderTree size={20} />,
-  path: "/groups",
-},
+    section: "OPERATIONS",
+  },
   {
     name: "Customers",
     icon: <Users size={20} />,
@@ -81,12 +78,52 @@ path:"/trial-balance"
     icon: <Receipt size={20} />,
     path: "/sales",
   },
+
+  // ACCOUNTING
+  {
+    section: "ACCOUNTING",
+  },
+  {
+    name: "Groups",
+    icon: <FolderTree size={20} />,
+    path: "/groups",
+  },
+  {
+    name: "Ledgers",
+    icon: <BookOpen size={20} />,
+    path: "/ledgers",
+  },
+  {
+    name: "Vouchers",
+    icon: <FileText size={20} />,
+    path: "/vouchers",
+  },
+  {
+    name: "Trial Balance",
+    icon: <Scale size={20} />,
+    path: "/trial-balance",
+  },
   {
     name: "Reports",
     icon: <BarChart3 size={20} />,
     path: "/reports",
   },
-];
+
+  // ACCOUNT
+  {
+    section: "ACCOUNT",
+  },
+  {
+    name: "Profile",
+    icon: <User size={20} />,
+    path: "/profile",
+  },
+  {
+    name: "Change Password",
+    icon: <KeyRound size={20} />,
+    path: "/change-password",
+  },
+].filter(Boolean);
 
 const adminMenus =
   role === "Admin"
@@ -112,14 +149,22 @@ function Sidebar() {
     <Box
       sx={{
         width: 260,
-        height: "100vh",
+        height: "100%",
         bgcolor: "#1E293B",
         color: "white",
         display: "flex",
         flexDirection: "column",
+        position: "sticky",
+        top: 0,
+        overflow: "hidden",
       }}
     >
-      <Box sx={{ px: 3, py: 2 }}>
+      <Box
+        sx={{
+          px: 3,
+          py: 2,
+        }}
+      >
         <Typography
           variant="h5"
           fontWeight="bold"
@@ -136,145 +181,49 @@ function Sidebar() {
         </Typography>
       </Box>
 
-      <List sx={{ flex: 1, px: 1 }}>
-        {mainMenus.map((menu) => (
-          <ListItemButton
-            key={menu.path}
-            component={NavLink}
-            to={menu.path}
-            sx={{
-              color: "white",
-              borderRadius: 2,
-              py: 1.4,
-              mb: 1,
-              transition: "background 0.2s ease",
-
-              "&.active": {
-                bgcolor: "#2563EB",
-                color: "#fff",
-              },
-
-              "&:hover": {
-                bgcolor: "#334155",
-              },
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                color: "inherit",
-                minWidth: 40,
-              }}
-            >
-              {menu.icon}
-            </ListItemIcon>
-
-            <ListItemText
-              primary={menu.name}
-              primaryTypographyProps={{
-                fontSize: 14,
-              }}
-            />
-          </ListItemButton>
-        ))}
-
-        {adminMenus.length > 0 && (
-          <>
-            <Divider
-              sx={{
-                bgcolor: "rgba(255,255,255,0.16)",
-                my: 2,
-                mx: 1,
-              }}
-            />
-            {adminMenus.map((menu) => (
-              <ListItemButton
-                key={menu.path}
-                component={NavLink}
-                to={menu.path}
-                sx={{
-                  color: "white",
-                  borderRadius: 2,
-                  py: 1.4,
-                  mb: 1,
-                  transition: "background 0.2s ease",
-
-                  "&.active": {
-                    bgcolor: "#2563EB",
-                    color: "#fff",
-                  },
-
-                  "&:hover": {
-                    bgcolor: "#334155",
-                  },
-                }}
-              >
-                <ListItemIcon
+      <List sx={{ flex: 1, overflowY: "auto" }}>
+        {menus.map((menu) => {
+          if (menu.section) {
+            return (
+              <Box key={menu.section} sx={{ mt: 2, mb: 1 }}>
+                <Typography
+                  variant="caption"
                   sx={{
-                    color: "inherit",
-                    minWidth: 40,
+                    px: 3,
+                    color: "#94A3B8",
+                    fontWeight: "bold",
+                    letterSpacing: 1,
                   }}
                 >
-                  {menu.icon}
-                </ListItemIcon>
+                  {menu.section}
+                </Typography>
+              </Box>
+            );
+          }
 
-                <ListItemText
-                  primary={menu.name}
-                  primaryTypographyProps={{
-                    fontSize: 14,
-                  }}
-                />
-              </ListItemButton>
-            ))}
-          </>
-        )}
-
-        <Divider
-          sx={{
-            bgcolor: "rgba(255,255,255,0.16)",
-            my: 2,
-            mx: 1,
-          }}
-        />
-
-        {accountMenus.map((menu) => (
-          <ListItemButton
-            key={menu.path}
-            component={NavLink}
-            to={menu.path}
-            sx={{
-              color: "white",
-              borderRadius: 2,
-              py: 1.4,
-              mb: 1,
-              transition: "background 0.2s ease",
-
-              "&.active": {
-                bgcolor: "#2563EB",
-                color: "#fff",
-              },
-
-              "&:hover": {
-                bgcolor: "#334155",
-              },
-            }}
-          >
-            <ListItemIcon
+          return (
+            <ListItemButton
+              key={menu.name}
+              component={NavLink}
+              to={menu.path}
               sx={{
-                color: "inherit",
-                minWidth: 40,
+                color: "white",
+                mx: 1,
+                borderRadius: 2,
+                mb: 1,
+                "&.active": {
+                  bgcolor: "#2563EB",
+                },
               }}
             >
-              {menu.icon}
-            </ListItemIcon>
+              <ListItemIcon sx={{ color: "white", minWidth: 40 }}>
+                {menu.icon}
+              </ListItemIcon>
 
-            <ListItemText
-              primary={menu.name}
-              primaryTypographyProps={{
-                fontSize: 14,
-              }}
-            />
-          </ListItemButton>
-        ))}
+              <ListItemText primary={menu.name} />
+            </ListItemButton>
+          );
+        })}
       </List>
 
       <Box sx={{ p: 2, mt: "auto" }}>

@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
+
+
+
+import { CircleHelp } from "lucide-react";
+
+import KeyboardShortcutDialog from "../Help/KeyboardShortcutDialog";
 import {
   AppBar,
   Toolbar,
@@ -18,6 +24,7 @@ import { Bell } from "lucide-react";
 function Navbar() {
   const navigate = useNavigate();
 const location = useLocation();
+const [helpOpen, setHelpOpen] = useState(false);
 
 const pageTitles = {
   "/dashboard": "Dashboard",
@@ -84,7 +91,7 @@ const pageTitle =
     variant="body2"
     color="text.secondary"
   >
-    Welcome back 👋
+    Welcome to SmartERP, your all-in-one solution for efficient business management. Navigate through the dashboard to access various modules and insights.
   </Typography>
 )}
         </Box>
@@ -101,6 +108,17 @@ const pageTitle =
               <Bell size={20} />
             </IconButton>
           </Tooltip>
+
+          <Tooltip title="Keyboard Guide">
+
+  <IconButton
+    color="inherit"
+    onClick={() => setHelpOpen(true)}
+  >
+    <CircleHelp size={22} />
+  </IconButton>
+
+</Tooltip>
 
           <Box
             sx={{
@@ -163,6 +181,10 @@ const pageTitle =
           </Menu>
         </Box>
       </Toolbar>
+      <KeyboardShortcutDialog
+  open={helpOpen}
+  onClose={() => setHelpOpen(false)}
+/>
     </AppBar>
   );
 }

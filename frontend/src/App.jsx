@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Vouchers from "./pages/Vouchers/Vouchers";
+import Ledgers from "./pages/Ledgers/Ledgers";
 import Login from "./pages/Login/Login";
 import Users from "./pages/Users/Users";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -161,6 +162,17 @@ element={
         element={
           <ProtectedRoute>
             <Reports />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Ledgers */}
+
+      <Route
+        path="/ledgers"
+        element={
+          <ProtectedRoute>
+            <Ledgers />
           </ProtectedRoute>
         }
       />

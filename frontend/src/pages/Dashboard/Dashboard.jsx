@@ -1,24 +1,32 @@
 import { useEffect, useState } from "react";
-
+import StatCard from "../../components/Dashboard/StatCard";
+import QuickActions from "../../components/Dashboard/QuickActions";
+import {
+Users,
+Truck,
+Boxes,
+Building2,
+Receipt,
+ShoppingCart,
+Package,
+Wallet,
+} from "lucide-react";
 import {
   Grid,
   Typography,
   CircularProgress,
 } from "@mui/material";
-
+import TopProducts from "../../components/Dashboard/TopProducts";
 import DashboardLayout from "../../layouts/DashboardLayout";
 
-import StatCard from "../../components/Cards/StatCard";
+import DashboardHeader from "../../components/Dashboard/DashboardHeader";
+import MonthlySalesChart from "../../components/Dashboard/MonthlySalesChart";
+import MonthlyPurchaseChart from "../../components/Dashboard/MonthlyPurchaseChart";
+import RecentSales from "../../components/Dashboard/RecentSales";
+import LowStock from "../../components/Dashboard/LowStock";
 
-import MonthlySalesChart from "../../components/Analytics/MonthlySalesChart";
-import MonthlyPurchaseChart from "../../components/Analytics/MonthlyPurchaseChart";
-import InventoryCard from "../../components/Analytics/InventoryCard";
-import LowStockTable from "../../components/Analytics/LowStockTable";
-import RecentSalesTable from "../../components/Analytics/RecentSalesTable";
-import RecentPurchaseTable from "../../components/Analytics/RecentPurchaseTable";
 
 import { getDashboard } from "../../services/dashboardApi";
-import { getDashboardAnalytics } from "../../services/dashboardAnalyticsApi";
 
 const initialDashboard = {
   customers: 0,
@@ -34,17 +42,13 @@ function Dashboard() {
   const [dashboard, setDashboard] =
     useState(initialDashboard);
 
-  const [analytics, setAnalytics] =
-    useState({
-      monthlySales: [],
-      monthlyPurchase: [],
-      lowStock: [],
-      recentSales: [],
-      recentPurchase: [],
-      inventory: {
-        inventory_value: 0,
-      },
-    });
+    const [analytics, setAnalytics] = useState({
+  monthlySales: [],
+  monthlyPurchase: [],
+  recentSales: [],
+  lowStock: [],
+  topProducts: [],
+});
 
   const [loading, setLoading] =
     useState(true);
@@ -54,182 +58,199 @@ function Dashboard() {
   }, []);
 
   const loadDashboard = async () => {
-    try {
-      const dashboardData =
-        await getDashboard();
+  try {
+    setLoading(true);
 
-      const analyticsData =
-        await getDashboardAnalytics();
+    const response = await getDashboard();
 
-      setDashboard(
-        dashboardData.dashboard
-      );
+    setDashboard(response.dashboard);
 
-      setAnalytics(analyticsData);
+    setAnalytics({
+  monthlySales: response.monthlySales,
+  monthlyPurchase: response.monthlyPurchase,
+  recentSales: response.recentSales,
+  lowStock: response.lowStock,
+  topProducts: response.topProducts,
+});
 
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (error) {
+
+    console.error(error);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
 
   if (loading) {
-    return (
-      <DashboardLayout>
-        <CircularProgress />
-      </DashboardLayout>
-    );
-  }
-
-  const cards = [
-    {
-      title: "Customers",
-      value: dashboard.customers,
-      color: "#2563EB",
-    },
-    {
-      title: "Suppliers",
-      value: dashboard.suppliers,
-      color: "#22C55E",
-    },
-    {
-      title: "Products",
-      value: dashboard.products,
-      color: "#F59E0B",
-    },
-    {
-      title: "Companies",
-      value: dashboard.companies,
-      color: "#8B5CF6",
-    },
-    {
-      title: "Sales",
-      value: `₹${dashboard.total_sales}`,
-      color: "#EF4444",
-    },
-    {
-      title: "Purchase",
-      value: `₹${dashboard.total_purchase}`,
-      color: "#14B8A6",
-    },
-    {
-      title: "Inventory",
-      value: dashboard.current_inventory,
-      color: "#EC4899",
-    },
-  ];
-
-    return (
+  return (
     <DashboardLayout>
 
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        mb={1}
-      >
-        Dashboard
-      </Typography>
-
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        mb={3}
-      >
-        Quick overview of your business performance and inventory health.
-      </Typography>
-
-      {/* KPI Cards */}
-
-      <Grid container spacing={3}>
-
-        {cards.map((card) => (
-          <Grid
-            key={card.title}
-            item
-            xs={12}
-            sm={6}
-            md={3}
-          >
-            <StatCard
-              title={card.title}
-              value={card.value}
-              color={card.color}
-            />
-          </Grid>
-        ))}
-
-      </Grid>
-
-      {/* Charts */}
-
       <Grid
         container
-        spacing={3}
-        sx={{ mt: 2 }}
+        justifyContent="center"
+        alignItems="center"
+        sx={{
+          height: "80vh",
+        }}
       >
-
-        <Grid item xs={12} lg={6}>
-          <MonthlySalesChart
-            data={analytics.monthlySales}
-          />
-        </Grid>
-
-        <Grid item xs={12} lg={6}>
-          <MonthlyPurchaseChart
-            data={analytics.monthlyPurchase}
-          />
-        </Grid>
-
-      </Grid>
-
-      {/* Inventory Card */}
-
-      <Grid
-        container
-        spacing={3}
-        sx={{ mt: 2 }}
-      >
-
-        <Grid item xs={12} md={4}>
-          <InventoryCard
-            value={
-              analytics.inventory
-                ?.inventory_value || 0
-            }
-          />
-        </Grid>
-
-      </Grid>
-
-      {/* Tables */}
-
-      <Grid
-        container
-        spacing={3}
-        sx={{ mt: 2 }}
-      >
-        <Grid item xs={12} md={4}>
-          <LowStockTable
-            data={analytics.lowStock}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <RecentSalesTable
-            data={analytics.recentSales}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <RecentPurchaseTable
-            data={analytics.recentPurchase}
-          />
-        </Grid>
+        <CircularProgress
+          size={60}
+        />
       </Grid>
 
     </DashboardLayout>
   );
+}
+
+  
+
+    return (
+    
+  <DashboardLayout>
+
+    <DashboardHeader />
+
+    {/* KPI Cards */}
+    <Grid container spacing={3}>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard
+          title="Customers"
+          value={dashboard.customers}
+          subtitle="Active"
+          icon={<Users size={28} />}
+          color="#2563EB"
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard
+          title="Suppliers"
+          value={dashboard.suppliers}
+          subtitle="Registered"
+          icon={<Truck size={28} />}
+          color="#16A34A"
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard
+          title="Products"
+          value={dashboard.products}
+          subtitle="Inventory"
+          icon={<Boxes size={28} />}
+          color="#F59E0B"
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard
+          title="Companies"
+          value={dashboard.companies}
+          subtitle="Business"
+          icon={<Building2 size={28} />}
+          color="#7C3AED"
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard
+          title="Sales"
+          value={`₹ ${Number(dashboard.total_sales).toLocaleString()}`}
+          subtitle="Overall"
+          icon={<Receipt size={28} />}
+          color="#DC2626"
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard
+          title="Purchase"
+          value={`₹ ${Number(dashboard.total_purchase).toLocaleString()}`}
+          subtitle="Overall"
+          icon={<ShoppingCart size={28} />}
+          color="#14B8A6"
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard
+          title="Inventory"
+          value={dashboard.current_inventory}
+          subtitle="Items"
+          icon={<Package size={28} />}
+          color="#EC4899"
+        />
+      </Grid>
+
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard
+          title="Inventory Value"
+          value={`₹ ${Number(dashboard.inventoryValue).toLocaleString()}`}
+          subtitle="Current Value"
+          icon={<Wallet size={28} />}
+          color="#2563EB"
+        />
+      </Grid>
+
+    </Grid>
+
+    {/* Charts */}
+
+    <Grid container spacing={3} sx={{ mt: 1 }}>
+
+      <Grid item xs={12} lg={8}>
+        <MonthlySalesChart
+          data={analytics.monthlySales}
+        />
+      </Grid>
+
+      <Grid item xs={12} lg={4}>
+        <MonthlyPurchaseChart
+          data={analytics.monthlyPurchase}
+        />
+      </Grid>
+
+    </Grid>
+
+    {/* Tables */}
+
+    <Grid container spacing={3} sx={{ mt: 1 }}>
+
+      <Grid item xs={12} lg={7}>
+        <RecentSales
+          sales={analytics.recentSales}
+        />
+      </Grid>
+
+      <Grid item xs={12} lg={5}>
+        <LowStock
+          items={analytics.lowStock}
+        />
+      </Grid>
+      <Grid container spacing={3} sx={{ mt: 1 }}>
+
+  <Grid item xs={12} md={6}>
+    <TopProducts
+      products={analytics.topProducts}
+    />
+  </Grid>
+
+  <Grid item xs={12} md={6}>
+    <QuickActions />
+  </Grid>
+
+</Grid>
+
+    </Grid>
+
+  </DashboardLayout>
+);
+    
+  
 }
 
 export default Dashboard;

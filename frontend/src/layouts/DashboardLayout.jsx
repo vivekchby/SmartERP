@@ -9,7 +9,7 @@ function DashboardLayout({ children }) {
     <Box
       sx={{
         display: "flex",
-        minHeight: "100vh",
+        height: "100vh",
         bgcolor: "#F8FAFC",
         overflow: "hidden",
       }}
@@ -21,6 +21,7 @@ function DashboardLayout({ children }) {
           flex: 1,
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
       >
         <Navbar />
@@ -28,6 +29,7 @@ function DashboardLayout({ children }) {
         <Box
           sx={{
             flex: 1,
+            overflowY: "auto",
             p: 3,
             width: "100%",
             maxWidth: 1440,
