@@ -62,25 +62,37 @@ const getDashboard = async (req, res) => {
 
     // ================= MONTHLY SALES =================
     const monthlySales = await pool.query(
-      `SELECT TO_CHAR(sale_date, 'Mon') month,
-        SUM(total_amount) sales
-       FROM sales
-       WHERE company_id=$1
-       GROUP BY EXTRACT(MONTH FROM sale_date), TO_CHAR(sale_date, 'Mon')
-       ORDER BY EXTRACT(MONTH FROM sale_date)`,
-      [companyId]
-    );
+  `
+  SELECT
+      TO_CHAR(sale_date, 'Mon') AS month,
+      SUM(total_amount) AS sales
+  FROM sales
+  WHERE company_id = $1
+  GROUP BY
+      EXTRACT(MONTH FROM sale_date),
+      TO_CHAR(sale_date, 'Mon')
+  ORDER BY
+      EXTRACT(MONTH FROM sale_date);
+  `,
+  [companyId]
+);
 
     // ================= MONTHLY PURCHASE =================
     const monthlyPurchase = await pool.query(
-      `SELECT TO_CHAR(purchase_date, 'Mon') month,
-        SUM(total_amount) purchase
-       FROM purchases
-       WHERE company_id=$1
-       GROUP BY EXTRACT(MONTH FROM purchase_date), TO_CHAR(purchase_date, 'Mon')
-       ORDER BY EXTRACT(MONTH FROM purchase_date)`,
-      [companyId]
-    );
+  `
+  SELECT
+      TO_CHAR(purchase_date, 'Mon') AS month,
+      SUM(total_amount) AS purchase
+  FROM purchases
+  WHERE company_id = $1
+  GROUP BY
+      EXTRACT(MONTH FROM purchase_date),
+      TO_CHAR(purchase_date, 'Mon')
+  ORDER BY
+      EXTRACT(MONTH FROM purchase_date);
+  `,
+  [companyId]
+);
 
     // ================= RECENT SALES =================
     const recentSales = await pool.query(
