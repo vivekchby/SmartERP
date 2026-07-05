@@ -51,12 +51,30 @@ function CompanyDialog({
           />
 
           <TextField
+            label="State"
+            name="state"
+            value={formData.state}
+            onChange={handleChange}
+            fullWidth
+            required
+          />
+
+          <TextField
+            label="Financial Year"
+            name="financial_year"
+            value={formData.financial_year}
+            onChange={handleChange}
+            fullWidth
+            required
+            placeholder="e.g. 2024-2025"
+          />
+
+          <TextField
             label="Phone"
             name="phone"
             value={formData.phone}
             onChange={handleChange}
             fullWidth
-            required
           />
 
           <TextField
@@ -65,7 +83,6 @@ function CompanyDialog({
             value={formData.email}
             onChange={handleChange}
             fullWidth
-            required
           />
 
           <TextField

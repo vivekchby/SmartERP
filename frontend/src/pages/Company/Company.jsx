@@ -17,6 +17,8 @@ import {
 const initialForm = {
   company_name: "",
   gst_number: "",
+  state: "",
+  financial_year: "",
   phone: "",
   email: "",
   address: "",
@@ -77,6 +79,8 @@ function Company() {
     const payload = {
       company_name: formData.company_name,
       gst_number: formData.gst_number,
+      state: formData.state,
+      financial_year: formData.financial_year,
       phone: formData.phone,
       email: formData.email,
       address: formData.address,

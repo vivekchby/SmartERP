@@ -36,7 +36,7 @@ const register = async (req, res) => {
       });
     }
 
-    await pool.query("BEGIN");
+await pool.query("BEGIN");
 
     // Create Company
 
@@ -98,6 +98,39 @@ await pool.query(
     companyId,
   ]
 );
+
+// Create Default Groups
+const defaultGroups = [
+  { name: 'Sundry Debtors', type: 'Liability' },
+  { name: 'Sundry Creditors', type: 'Liability' },
+  { name: 'Cash in Hand', type: 'Asset' },
+  { name: 'Bank Accounts', type: 'Asset' },
+  { name: 'Sales Accounts', type: 'Revenue' },
+  { name: 'Purchase Accounts', type: 'Expense' },
+  { name: 'Direct Expenses', type: 'Expense' },
+  { name: 'Indirect Expenses', type: 'Expense' },
+  { name: 'Direct Incomes', type: 'Revenue' },
+  { name: 'Indirect Incomes', type: 'Revenue' },
+  { name: 'Capital Account', type: 'Equity' },
+  { name: 'Current Assets', type: 'Asset' },
+  { name: 'Current Liabilities', type: 'Liability' },
+  { name: 'Fixed Assets', type: 'Asset' },
+  { name: 'Investments', type: 'Asset' },
+  { name: 'Loans & Advances', type: 'Asset' },
+  { name: 'Duties & Taxes', type: 'Liability' },
+  { name: 'Provisions', type: 'Liability' },
+  { name: 'Reserves & Surplus', type: 'Equity' },
+  { name: 'Stock in Hand', type: 'Asset' },
+];
+
+for (const group of defaultGroups) {
+  await pool.query(
+    `INSERT INTO groups (company_id, group_name, group_type, is_editable)
+     VALUES ($1, $2, $3, false)
+     ON CONFLICT DO NOTHING`,
+    [companyId, group.name, group.type]
+  );
+}
 
     await pool.query("COMMIT");
 

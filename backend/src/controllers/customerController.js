@@ -7,7 +7,9 @@ const createCustomer = async (req, res) => {
       company_id,
       name,
       phone,
-      address
+      email,
+      address,
+      gst_number
     } = req.body;
     // Validation
 
@@ -39,8 +41,8 @@ if (!address) {
     });
 }
 
-// Get Sundry Debtors Group
-const debtorGroup = await pool.query(
+// Get or Create Sundry Debtors Group
+let debtorGroup = await pool.query(
   `SELECT id
    FROM groups
    WHERE company_id=$1
@@ -49,10 +51,13 @@ const debtorGroup = await pool.query(
 );
 
 if (debtorGroup.rows.length === 0) {
-  return res.status(400).json({
-    success: false,
-    message: "Sundry Debtors group not found",
-  });
+  const newGroup = await pool.query(
+    `INSERT INTO groups (company_id, group_name, group_type, is_editable)
+     VALUES ($1, 'Sundry Debtors', 'Liability', false)
+     RETURNING id`,
+    [company_id]
+  );
+  debtorGroup = { rows: [newGroup.rows[0]] };
 }
 
  const existingCustomer = await pool.query(
@@ -83,7 +88,7 @@ const ledgerResult = await pool.query(
   [
     company_id,
     debtorGroup.rows[0].id,
-    customer_name,
+    name,
     0,
     "Dr",
   ]
@@ -102,16 +107,16 @@ const ledgerId = ledgerResult.rows[0].id;
  address,
  gst_number
 )
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      VALUES($1,$2,$3,$4,$5,$6,$7)
       RETURNING *`,
       [
         company_id,
         ledgerId,
         name,
         phone,
-        email,
+        email || null,
         address,
-        gst_number
+        gst_number || null
       ]
     );
    
@@ -163,7 +168,7 @@ const result = await pool.query(
 SELECT *
 FROM customers
 WHERE company_id=$1
-AND LOWER(name)
+AND LOWER(customer_name)
 LIKE LOWER($2)
 ORDER BY created_at DESC LIMIT $3 OFFSET $4
 `,
@@ -246,7 +251,7 @@ if (customer.rows.length === 0) {
 
     const result = await pool.query(
       `UPDATE customers
-       SET name=$1,
+       SET customer_name=$1,
            phone=$2,
            address=$3
        WHERE id=$4
