@@ -80,18 +80,19 @@ const ledgerResult = await pool.query(
     company_id,
     group_id,
     ledger_name,
+    ledger_type,
     opening_balance
   )
-  VALUES($1,$2,$3,$4)
+  VALUES($1,$2,$3,$4,$5)
   RETURNING id`,
   [
     company_id,
     debtorGroup.rows[0].id,
     name,
+    "Customer",
     0,
   ]
 );
-
 const ledgerId = ledgerResult.rows[0].id;
 
     const result = await pool.query(
