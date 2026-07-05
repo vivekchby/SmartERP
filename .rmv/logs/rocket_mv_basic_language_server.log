@@ -2302,3 +2302,17 @@ Account{name=src, path=C:/Users/mrviv/SmartERP/frontend/node_modules/es-toolkit/
 Account{name=..., path=..., type=PREDICT}
 2026-07-05 08:47:35.601 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.account.AccountManager - [client:40010105]load account manager finish
 2026-07-05 08:47:35.603 [pool-3-thread-1] INFO  com.rs.mv.mvvs.instance.userspace.UserspaceManager - [framework:30010402]config file(C:\Users\mrviv/.rmv/config) watcher launch successful
+2026-07-05 09:03:57.811 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
+2026-07-05 09:09:25.095 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/frontend/src/pages/Company)
+2026-07-05 09:09:29.788 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/frontend/src/pages/Company)
+2026-07-05 09:09:37.779 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/frontend/src/components/Company)
+2026-07-05 09:09:43.018 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/frontend/src/components/Company)
+2026-07-05 09:15:24.042 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
+2026-07-05 09:15:27.117 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
+2026-07-05 09:15:57.822 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/frontend/src/components/Company)
+2026-07-05 09:15:58.244 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
+2026-07-05 09:16:01.730 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
+2026-07-05 09:16:43.167 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
+2026-07-05 09:16:49.734 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
+2026-07-05 09:17:56.192 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
+2026-07-05 09:17:59.726 [pool-3-thread-1] INFO  com.rs.mv.mvvs.client.catalog.from.scan.CurrentPathScanner - [client:400205]scan file in current open file directory(C:/Users/mrviv/SmartERP/backend/src/controllers)
